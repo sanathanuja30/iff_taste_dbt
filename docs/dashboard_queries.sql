@@ -66,6 +66,8 @@ WHERE fr.recipe_id = 'PHMV';  -- parameterise this
 
 -- Q2b: Relative importance – how many recipes use each raw material?
 -- If we lose access to a raw material, how many recipes are affected?
+-- Demonstrates ALL Recipe Drill-down filters from the PDF (commented as needed):
+--   • Raw material name | Flavour name | Ingredient name | Provider name | Provider country
 SELECT
     rm.raw_material_name,
     COUNT(DISTINCT fr.recipe_id)                    AS recipes_affected,
@@ -76,13 +78,19 @@ SELECT
     )                                               AS pct_of_all_recipes
 FROM main_gold.fact_recipes fr
 JOIN main_gold.dim_raw_material rm ON rm.raw_material_id = fr.raw_material_key
--- Optional filters:
--- WHERE fr.provider_country = 'Italy'
+WHERE 1 = 1
+  -- Filter examples (uncomment / parameterise as needed):
+  -- AND rm.raw_material_name = 'Fatty Acid'      -- Raw material name filter
+  -- AND fr.flavour_name      = 'Vanilla'         -- Flavour name filter
+  -- AND fr.ingredient_name   = 'Sucrose'         -- Ingredient name filter
+  -- AND fr.provider_name     = 'Givaudan'        -- Provider name filter
+  -- AND fr.provider_country  = 'Italy'           -- Provider country filter
 GROUP BY rm.raw_material_name
 ORDER BY recipes_affected DESC;
 
 
 -- Q2c: Relative importance – how many recipes use each flavour?
+-- Same five Recipe Drill-down filters apply.
 SELECT
     f.flavour_name,
     COUNT(DISTINCT fr.recipe_id)                    AS recipes_affected,
@@ -93,13 +101,18 @@ SELECT
     )                                               AS pct_of_all_recipes
 FROM main_gold.fact_recipes fr
 JOIN main_gold.dim_flavour f ON f.flavour_id = fr.flavour_key
--- Optional filters:
--- WHERE fr.raw_material_name = 'Fatty Acid'
+WHERE 1 = 1
+  -- AND fr.raw_material_name = 'Fatty Acid'
+  -- AND f.flavour_name        = 'Vanilla'
+  -- AND fr.ingredient_name    = 'Sucrose'
+  -- AND fr.provider_name      = 'Givaudan'
+  -- AND fr.provider_country   = 'Italy'
 GROUP BY f.flavour_name
 ORDER BY recipes_affected DESC;
 
 
 -- Q2d: Relative importance – how many recipes use each ingredient, by provider?
+-- Same five Recipe Drill-down filters apply.
 SELECT
     i.ingredient_name,
     i.provider_name,
@@ -107,8 +120,12 @@ SELECT
     COUNT(DISTINCT fr.recipe_id)                    AS recipes_affected
 FROM main_gold.fact_recipes fr
 JOIN main_gold.dim_ingredient i ON i.ingredient_id = fr.ingredient_key
--- Optional filters:
--- WHERE i.provider_country = 'France'
+WHERE 1 = 1
+  -- AND fr.raw_material_name = 'Fatty Acid'
+  -- AND fr.flavour_name      = 'Vanilla'
+  -- AND i.ingredient_name    = 'Sucrose'
+  -- AND i.provider_name      = 'Givaudan'
+  -- AND i.provider_country   = 'France'
 GROUP BY i.ingredient_name, i.provider_name, i.provider_country
 ORDER BY recipes_affected DESC;
 
@@ -121,6 +138,9 @@ ORDER BY recipes_affected DESC;
 -- =============================================================================
 
 -- Q3a: Most valuable customers (total sales in USD)
+-- Demonstrates ALL Sales Performance filters from the PDF:
+--   • Customer name | Customer country | Flavour name | Transaction country
+--   • Transaction time period (years back, quarters)
 SELECT
     cu.customer_name,
     cu.location_country                             AS customer_country,
@@ -128,25 +148,36 @@ SELECT
     SUM(fst.amount_dollar)                          AS total_sales_usd
 FROM main_gold.fact_sales_transactions fst
 JOIN main_gold.dim_customer cu ON cu.customer_id = fst.customer_key
--- Optional filters:
--- WHERE cu.location_country = 'Germany'
--- AND fst.transaction_country = 'France'
--- AND fst.transaction_date >= (CURRENT_DATE - INTERVAL '2 years')   -- last 2 years
--- AND d.year_quarter_label IN ('2024-Q1', '2024-Q2')                -- by quarter
+JOIN main_gold.dim_flavour   f  ON f.flavour_id   = fst.flavour_key
+JOIN main_gold.dim_date      d  ON d.date_key     = fst.date_key
+WHERE 1 = 1
+  -- AND cu.customer_name        = 'Acme Foods'                          -- Customer name
+  -- AND cu.location_country     = 'Germany'                             -- Customer country
+  -- AND f.flavour_name          = 'Vanilla'                             -- Flavour name
+  -- AND fst.transaction_country = 'France'                              -- Transaction country
+  -- AND fst.transaction_date   >= (CURRENT_DATE - INTERVAL '2 years')   -- Last N years
+  -- AND d.year_quarter_label IN ('2024-Q1', '2024-Q2')                  -- Specific quarter(s)
 GROUP BY cu.customer_name, cu.location_country
 ORDER BY total_sales_usd DESC;
 
 
 -- Q3b: Most valuable flavours (by USD sales and transaction count)
+-- Same five Sales Performance filters apply.
 SELECT
     f.flavour_name,
     COUNT(DISTINCT fst.transaction_id)              AS num_transactions,
     SUM(fst.amount_dollar)                          AS total_sales_usd
 FROM main_gold.fact_sales_transactions fst
-JOIN main_gold.dim_flavour f ON f.flavour_id = fst.flavour_key
--- Optional filters:
--- WHERE fst.transaction_country = 'India'
--- AND fst.transaction_year >= YEAR(CURRENT_DATE) - 1       -- last N years
+JOIN main_gold.dim_flavour   f  ON f.flavour_id   = fst.flavour_key
+JOIN main_gold.dim_customer  cu ON cu.customer_id = fst.customer_key
+JOIN main_gold.dim_date      d  ON d.date_key     = fst.date_key
+WHERE 1 = 1
+  -- AND cu.customer_name        = 'Acme Foods'
+  -- AND cu.location_country     = 'Germany'
+  -- AND f.flavour_name          = 'Vanilla'
+  -- AND fst.transaction_country = 'India'
+  -- AND fst.transaction_year   >= YEAR(CURRENT_DATE) - 1                -- Last N years
+  -- AND d.year_quarter_label IN ('2024-Q3', '2024-Q4')                  -- Specific quarter(s)
 GROUP BY f.flavour_name
 ORDER BY total_sales_usd DESC;
 

@@ -3,5 +3,8 @@ iff_taste:
   outputs:
     dev:
       type: duckdb
-      path: /home/claude/iff_taste_dbt/iff_taste.duckdb
+      # Relative path: DuckDB resolves this against the dbt project root,
+      # so the project runs out of the box on any machine.
+      # Override with the DBT_DUCKDB_PATH env var if needed.
+      path: "{{ env_var('DBT_DUCKDB_PATH', 'iff_taste.duckdb') }}"
       threads: 4

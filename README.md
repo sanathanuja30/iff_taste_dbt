@@ -15,8 +15,8 @@ This project implements a **medallion-architecture data pipeline** for IFF Taste
 ### Setup
 
 ```bash
-# 1. Install dependencies
-pip install dbt-duckdb
+# 1. Install dependencies (pinned versions in requirements.txt)
+pip install -r requirements.txt
 
 # 2. Navigate to project root
 cd iff_taste_dbt
