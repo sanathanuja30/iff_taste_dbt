@@ -1,0 +1,4 @@
+*.duckdb
+*.log
+.env
+__pycache__/
