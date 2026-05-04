@@ -1,0 +1,7 @@
+iff_taste:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: /home/claude/iff_taste_dbt/iff_taste.duckdb
+      threads: 4

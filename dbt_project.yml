@@ -1,0 +1,32 @@
+name: 'iff_taste'
+version: '1.0.0'
+config-version: 2
+
+profile: 'iff_taste'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+analysis-paths: ["analyses"]
+docs-paths: ["docs"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+seeds:
+  iff_taste:
+    +schema: raw
+
+models:
+  iff_taste:
+    bronze:
+      +schema: bronze
+      +materialized: table
+    silver:
+      +schema: silver
+      +materialized: table
+    gold:
+      +schema: gold
+      +materialized: table
