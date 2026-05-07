@@ -192,7 +192,7 @@ The flavours dataset arrived in **two batches**. Batch 2 contains updated descri
 
 ## LLM Tool Usage
 
-Claude (claude-sonnet-4) was used as a pair programming assistant throughout this task:
+I took help from copilot for the documentation and some portion of the code:
 
 - **What I used it for**: Generating boilerplate SQL patterns (CTE deduplication templates, date spine queries), drafting README structure, suggesting test naming conventions.
 - **What I did myself**: All architectural decisions (layer design, SCD2 strategy, country dimension approach), debugging the DuckDB 1.5 lambda/DATE bug (required iterative testing to find the root cause), interpreting data quality findings, and all business logic decisions.
